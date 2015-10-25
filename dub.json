@@ -19,7 +19,7 @@
             "targetName": "dstep",
             "sourcePaths": ["dstep", "clang"],
             "importPaths": ["dstep", "clang"],
-            "lflags-posix": ["-lclang", "-rpath", ".", "-L."],
+            "lflags-posix": ["-lclang-3.6","-lz", "-rpath", ".", "-L."],
             "lflags-windows": ["+\\", "+clang"]
         },
 
