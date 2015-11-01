@@ -29,6 +29,7 @@ When /^I successfully convert the test file "([^"]*)"$/ do |file|
 end
 
 When /^I successfully convert the test file "([^"]*)" in "([^"]*)" with the flags "([^"]*)"$/ do |file, path, flags|
+  puts %{I successfully run `dstep test_files/#{path}/#{file}.h #{flags} -o #{file}.d`}
   step %{I successfully run `dstep test_files/#{path}/#{file}.h #{flags} -o #{file}.d`}
 end
 
@@ -48,6 +49,13 @@ Then /^I test the file "([^"]*)" in "([^"]*)"$/ do |file, path|
   step %{an expected file named "#{file}" in "#{path}"}
   step %{I successfully convert the test file "#{file}" in "#{path}"}
   step %{the files "#{file}.d" and "test_files/#{path}/#{file}.d" should be equal}
+end
+
+Then /^I test the file "([^"]*)" with filter "([^"]*)" and prefix "([^"]*)"$/ do |file, filter, prefix|
+    step %{a test file named "#{file}"}
+    step %{an expected file named "#{file}"}
+    step %{I successfully convert the test file "#{file}" in "" with the flags "--import-filter #{filter} --import-prefix #{prefix}"}
+    step %{the files "#{file}.d" and "test_files/#{file}.d" should be equal}
 end
 
 if OSX

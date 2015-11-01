@@ -27,6 +27,7 @@
             "name": "test",
             "mainSourceFile": "test.d",
             "targetName": "test",
+            "lflags-posix": ["-lclang-3.6","-lz", "-rpath", ".", "-L."],
             "excludedSourceFiles": ["dstep/*", "clang/*"]
         }
     ],
