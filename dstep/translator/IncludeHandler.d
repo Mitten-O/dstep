@@ -7,6 +7,10 @@
 module dstep.translator.IncludeHandler;
 
 import Path = std.path;
+import std.regex;
+import std.range;
+import std.array;
+import std.conv;
 
 import mambo.core._;
 
@@ -26,6 +30,11 @@ class IncludeHandler
 {
     private string[] rawIncludes;
     private string[] imports;
+    // Includes matching this will be converted to imports.
+    private Regex!char convertableIncludePattern = regex(".*");
+    // Prefix for auto generated imports.
+    private string importPrefix = "";
+
     static string[string] knownIncludes;
 
     static this ()
@@ -109,17 +118,29 @@ class IncludeHandler
         imports ~= "core.stdc.config";
     }
 
+    /// Makes includes that match regex filter be converted to import with prefix.
+    void setAutoImportPrefix(string prefix){
+        this.importPrefix = prefix;
+    }
+
+    /// Makes includes that match regex filter be converted to import with prefix.
+    void setAutoImportFilter(string filter){
+        this.convertableIncludePattern = regex(filter);
+    }
+
     string[] toImports ()
     {
-        auto r =  rawIncludes.map!((e) {
+        auto r =  mambo.core.Array.map!((e) {
             if (auto i = isKnownInclude(e))
                 return toImport(i);
+            if( isConvertableInclude(e) )
+                return toImport(autoConvertInclude(e));
 
             else
                 return "";
-        });
+        })(rawIncludes);
 
-        auto imps = imports.map!(e => toImport(e));
+        auto imps = mambo.core.Array.map!(e => toImport(e))(imports);
 
         return r.append(imps).filter!(e => e.any).unique.toArray;
     }
@@ -139,5 +160,20 @@ private:
             return r.value;
 
         return null;
+    }
+
+    /// Checks if the given include file name should be converted to an import declaration.
+    bool isConvertableInclude(string include)
+    {
+        return cast(bool)(matchFirst(include, convertableIncludePattern));
+    }
+
+    /// Generates an importable module name from an include file name.
+    string autoConvertInclude(string include)
+    {
+        string last_component = text(retro(Path.pathSplitter(include)).front);
+        string pure_name = Path.stripExtension( last_component );
+
+        return this.importPrefix ~ pure_name;
     }
 }
