@@ -133,11 +133,11 @@ private:
         if (arguments.rawArgs.any!((string e) => e == "-ObjC"))
             handleObjectiveC();
 
-		if( arguments["import-prefix"].hasValue )
-			handleAutoImportPrefix(arguments["import-prefix"].value);
+        if (arguments["import-prefix"].hasValue)
+            handleAutoImportPrefix(arguments["import-prefix"].value);
 
-		if( arguments["import-filter"].hasValue )
-			handleAutoImportFilter(arguments["import-filter"].value);
+        if (arguments["import-filter"].hasValue)
+            handleAutoImportFilter(arguments["import-filter"].value);
     }
 
     void handleObjectiveC ()

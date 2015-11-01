@@ -30,10 +30,13 @@ class IncludeHandler
 {
     private string[] rawIncludes;
     private string[] imports;
+
     // True if includes should be converted to imports.
     private bool convertIncludes = false;
+
     // Includes matching this will be converted to imports.
     private Regex!char convertableIncludePattern = regex(".*");
+
     // Prefix for auto generated imports.
     private string importPrefix = "";
 
@@ -121,13 +124,15 @@ class IncludeHandler
     }
 
     /// Makes includes that match regex filter be converted to import with prefix.
-    void setAutoImportPrefix(string prefix){
+    void setAutoImportPrefix (string prefix)
+    {
         this.convertIncludes = true;
         this.importPrefix = prefix;
     }
 
     /// Makes includes that match regex filter be converted to import with prefix.
-    void setAutoImportFilter(string filter){
+    void setAutoImportFilter (string filter)
+    {
         this.convertIncludes = true;
         this.convertableIncludePattern = regex(filter);
     }
@@ -139,7 +144,6 @@ class IncludeHandler
                 return toImport(i);
             else if( this.convertIncludes && isConvertableInclude(e) )
                 return toImport(autoConvertInclude(e));
-
             else
                 return "";
         })(rawIncludes);
@@ -147,6 +151,13 @@ class IncludeHandler
         auto imps = mambo.core.Array.map!(e => toImport(e))(imports);
 
         return r.append(imps).filter!(e => e.any).unique.toArray;
+    }
+
+    /// Returns the base name (last component without extension) of a file path.
+    static string baseName (string path)
+    {
+        string last_component = text(retro(Path.pathSplitter(path)).front);
+        return Path.stripExtension( last_component );
     }
 
 private:
@@ -167,17 +178,15 @@ private:
     }
 
     /// Checks if the given include file name should be converted to an import declaration.
-    bool isConvertableInclude(string include)
+    bool isConvertableInclude (string include)
     {
         return cast(bool)(matchFirst(include, convertableIncludePattern));
     }
 
+
     /// Generates an importable module name from an include file name.
     string autoConvertInclude(string include)
     {
-        string last_component = text(retro(Path.pathSplitter(include)).front);
-        string pure_name = Path.stripExtension( last_component );
-
-        return this.importPrefix ~ pure_name;
+        return this.importPrefix ~ baseName(include);
     }
 }
