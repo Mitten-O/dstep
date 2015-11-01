@@ -19,3 +19,6 @@ clangs
 *.gch
 bin/test
 .DS_Store
+*~
+*.userprefs
+
