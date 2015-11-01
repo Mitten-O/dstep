@@ -30,6 +30,8 @@ class IncludeHandler
 {
     private string[] rawIncludes;
     private string[] imports;
+    // True if includes should be converted to imports.
+    private bool convertIncludes = false;
     // Includes matching this will be converted to imports.
     private Regex!char convertableIncludePattern = regex(".*");
     // Prefix for auto generated imports.
@@ -120,11 +122,13 @@ class IncludeHandler
 
     /// Makes includes that match regex filter be converted to import with prefix.
     void setAutoImportPrefix(string prefix){
+        this.convertIncludes = true;
         this.importPrefix = prefix;
     }
 
     /// Makes includes that match regex filter be converted to import with prefix.
     void setAutoImportFilter(string filter){
+        this.convertIncludes = true;
         this.convertableIncludePattern = regex(filter);
     }
 
@@ -133,7 +137,7 @@ class IncludeHandler
         auto r =  mambo.core.Array.map!((e) {
             if (auto i = isKnownInclude(e))
                 return toImport(i);
-            if( isConvertableInclude(e) )
+            else if( this.convertIncludes && isConvertableInclude(e) )
                 return toImport(autoConvertInclude(e));
 
             else
