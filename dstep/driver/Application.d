@@ -78,7 +78,12 @@ class Application : DStack.Application
 
         arguments('p',"import-prefix", "A prefix to add to any custom generated import")
             .params(1)
-                .defaults("");
+            .defaults("");
+
+        arguments('m',"declare-module", "Add module declaration to the top of the file." ~
+        "Generated with the same logic as imports. You may optionally speficy a prefix as an argument to this option.")
+            .params(0,1)
+            .defaults("");
     }
 
 private:
@@ -110,6 +115,10 @@ private:
             Translator.Options options;
             options.outputFile = arguments.output;
             options.language = language;
+            options.declareModule = arguments["declare-module"].isPresent;
+
+            if( options.declareModule )
+                options.modulePrefix = arguments["declare-module"].value;
 
             auto translator = new Translator(file, translationUnit, options);
             translator.translate;

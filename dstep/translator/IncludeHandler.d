@@ -183,9 +183,8 @@ private:
         return cast(bool)(matchFirst(include, convertableIncludePattern));
     }
 
-
     /// Generates an importable module name from an include file name.
-    string autoConvertInclude(string include)
+    string autoConvertInclude (string include)
     {
         return this.importPrefix ~ baseName(include);
     }

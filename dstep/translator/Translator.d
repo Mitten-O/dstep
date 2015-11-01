@@ -34,6 +34,8 @@ class Translator
     {
         string outputFile;
         Language language = Language.c;
+        bool declareModule = false;
+        string modulePrefix = "";
     }
 
     private
@@ -45,6 +47,8 @@ class Translator
         File inputFile;
         Language language;
         string[string] deferredDeclarations;
+        bool declareModule = false;
+        string modulePrefix = "";
     }
 
     this (string inputFilename, TranslationUnit translationUnit, const Options options = Options.init)
@@ -53,12 +57,20 @@ class Translator
         this.translationUnit = translationUnit;
         outputFile = options.outputFile;
         language = options.language;
+        this.declareModule = options.declareModule;
+        this.modulePrefix = options.modulePrefix;
 
         inputFile = translationUnit.file(inputFilename);
     }
 
     void translate ()
     {
+        // Declare module if configured to do thus.
+        if (this.declareModule )
+        {
+            output.before ~= "module " ~ this.modulePrefix ~ includeHandler.baseName(this.inputFilename) ~ ";\n\n";
+        }
+
         foreach (cursor, parent ; translationUnit.declarations)
         {
             if (skipDeclaration(cursor))
